@@ -131,6 +131,15 @@ if test "$gcc" -eq 1 && ($cc -c $cflags $test.c) 2>/dev/null; then
 	LDSHARED=${LDSHARED-"$cc -shared -Wl,-export-all -Wl,--enable-auto-image-base -Wl,--out-implib=${IMPORTLIB}"}
 	LDSHAREDLIBC=''
         EXE='.exe' ;;
+  MSYS* | MSys* | msys* )
+  	SFLAGS="${CFLAGS}"
+	LDFLAGS="-L. -lz ${old_ldflags}"
+	shared_ext='.dll'
+	SHAREDLIB='msys-z.dll'
+	IMPORTLIB='libz.dll.a'
+	LDSHARED=${LDSHARED-"$cc -shared -Wl,-export-all -Wl,--enable-auto-image-base -Wl,--out-implib=${IMPORTLIB}"}
+	LDSHAREDLIBC=''
+        EXE='.exe' ;;
   MINGW*|mingw*)
   	SFLAGS="${CFLAGS}"
 	LDFLAGS="-L. -lz ${old_ldflags}"
@@ -239,6 +248,13 @@ fi
 case "$uname" in
   *CYGWIN* | *Cygwin* | *cygwin* )
     # On cygwin, we always build both shared and static libs
+    ALL="static shared"
+    SHAREDLIBPOST='/bin/true'
+    SHAREDTARGET=${SHAREDLIB}
+    TEST="all teststatic testshared"
+    ;;
+  *MSYS* | *MSys* | *msys* )
+    # On msys, we always build both shared and static libs
     ALL="static shared"
     SHAREDLIBPOST='/bin/true'
     SHAREDTARGET=${SHAREDLIB}
